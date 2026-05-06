@@ -1,15 +1,17 @@
 import { useState } from "react";
-import Login from "./components/Login";
-import Dashboard from "./components/Dashboard";
 
 export default function App() {
-  const [isAuth, setIsAuth] = useState(
-    !!localStorage.getItem("token")
-  );
+  const [show, setShow] = useState(false);
 
-  return isAuth ? (
-    <Dashboard />
-  ) : (
-    <Login onLogin={() => setIsAuth(true)} />
+  return (
+    <div style={{ padding: 20 }}>
+      <h1>App Loaded ✅</h1>
+
+      <button onClick={() => setShow(!show)}>
+        Toggle Dashboard
+      </button>
+
+      {show && <div>Dashboard placeholder works</div>}
+    </div>
   );
 }
