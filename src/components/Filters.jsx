@@ -12,8 +12,10 @@ export default function Filters({ onSearch }) {
   const [endTime, setEndTime] = useState("");
 
   useEffect(() => {
-    API.get("/locations").then((res) => setLocations(res.data));
-  }, []);
+  API.get("/locations")
+    .then(res => setLocations(res.data))
+    .catch(() => setLocations([])); // prevent crash
+}, []);
 
   const fetchCameras = async (loc) => {
     setLocation(loc);
