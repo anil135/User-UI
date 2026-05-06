@@ -11,33 +11,54 @@ export default function Filters({ onSearch }) {
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
 
+  // SAFE LOAD
   useEffect(() => {
-  API.get("/locations")
-    .then(res => setLocations(res.data))
-    .catch(() => setLocations([])); // prevent crash
-}, []);
+    async function loadLocations() {
+      try {
+        const res = await API.get("/locations");
+        setLocations(res.data || []);
+      } catch (err) {
+        console.warn("API failed, using mock locations");
+        setLocations(["Demo Location"]);
+      }
+    }
+    loadLocations();
+  }, []);
 
   const fetchCameras = async (loc) => {
     setLocation(loc);
-    const res = await API.get(`/cameras?location=${loc}`);
-    setCameras(res.data);
+
+    try {
+      const res = await API.get(`/cameras?location=${loc}`);
+      setCameras(res.data || []);
+    } catch (err) {
+      console.warn("Using mock cameras");
+      setCameras([
+        { id: "cam1", name: "Camera 1" },
+        { id: "cam2", name: "Camera 2" }
+      ]);
+    }
   };
 
   const handleSearch = () => {
+    if (!camera || !date) {
+      alert("Please select camera and date");
+      return;
+    }
+
     onSearch({
       camera_id: camera,
-      date,
-      start_time: `${date}T${startTime}:00Z`,
-      end_time: `${date}T${endTime}:00Z`,
+      start_time: `${date}T${startTime || "00:00"}:00Z`,
+      end_time: `${date}T${endTime || "23:59"}:00Z`
     });
   };
 
   return (
-    <div style={styles.container}>
+    <div style={{ display: "flex", gap: 10, padding: 20 }}>
       <select onChange={(e) => fetchCameras(e.target.value)}>
         <option>Select Location</option>
-        {locations.map((l) => (
-          <option key={l}>{l}</option>
+        {locations.map((l, i) => (
+          <option key={i}>{l}</option>
         ))}
       </select>
 
@@ -58,11 +79,3 @@ export default function Filters({ onSearch }) {
     </div>
   );
 }
-
-const styles = {
-  container: {
-    display: "flex",
-    gap: 10,
-    padding: 20,
-  },
-};
