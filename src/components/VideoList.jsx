@@ -1,20 +1,22 @@
 import { useState } from "react";
 import VideoPlayer from "./VideoPlayer";
 
-export default function VideoList({ videos }) {
+export default function VideoList({ videos = [] }) {
   const [selected, setSelected] = useState(null);
 
-  return (
-    <div>
-      <h3>Results</h3>
+  if (!videos.length) {
+    return <p style={{ padding: 20 }}>No videos found</p>;
+  }
 
+  return (
+    <div style={{ padding: 20 }}>
       {videos.map((v, i) => (
-        <div key={i} style={styles.row}>
+        <div key={i} style={{ marginBottom: 10 }}>
           <span>{v.timestamp}</span>
 
           <button onClick={() => setSelected(v.url)}>Play</button>
 
-          <a href={v.url} download>
+          <a href={v.url} target="_blank" rel="noreferrer">
             <button>Download</button>
           </a>
         </div>
@@ -28,11 +30,3 @@ export default function VideoList({ videos }) {
     </div>
   );
 }
-
-const styles = {
-  row: {
-    display: "flex",
-    gap: 10,
-    marginBottom: 10,
-  },
-};
